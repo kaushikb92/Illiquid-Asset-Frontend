@@ -11,6 +11,12 @@
   background-repeat: no-repeat;
   background-position: 189px 8px;;
 }
+.logo {
+    background-image: url('./images/FintechLabLogo.bmp');
+    background-size: 33px 29px;
+    background-repeat: no-repeat;
+    background-position: 178px 4px;
+}
 .home-icon:hover{
   background-image: url('./images/home1.bmp');
   background-size: 21px 20px;

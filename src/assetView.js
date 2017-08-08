@@ -2,16 +2,15 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import hashFnv32a from './hash';
-import {assetAbi, atokenAbi, assetAddr, atokenAddr, txAbi, txAddr} from './constants'
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 import Web3 from 'web3'
 
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
-
-var assetCon = web3.eth.contract(assetAbi).at(assetAddr);
-var atokenCon = web3.eth.contract(atokenAbi).at(atokenAddr);
-var txCon = web3.eth.contract(txAbi).at(txAddr);
-
 var walletAddr = web3.eth.accounts[0];
+
+var userId = window.localStorage.getItem('loginID');
+var loginStatus = window.localStorage.getItem('loginStatus');
+
+var userWallet;
 
 export default class AssetView extends Component {
   constructor(props) {
@@ -20,17 +19,29 @@ export default class AssetView extends Component {
     this.state = { asset: [] }
   }
   componentWillMount() {
-    var data =[] ;
+       var userId = window.localStorage.getItem('loginID');
+    var loginStatus = window.localStorage.getItem('loginStatus');
+    this.getWalletAddress(userId);
+    
+}
 
-    var assetIds = assetCon.getAssetIdsByAddress(walletAddr);
+async getWalletAddress(userId){
+        userWallet = await userCon.getWalletByUserID(userId);
+        this.getData(userWallet);
+}
+
+async getData(userWallet){
+var data =[] ;
+
+ var assetIds = assetCon.getAssetIdsByAddress(userWallet);
     var len = assetIds.length;
     var i;
     for (i = 0; i < len; i++) {
       var assetTs;
-      var assetDetails = assetCon.getAssetDetailsByAssetIdAndAddress(walletAddr,assetIds[i]);
-      var assetQty = atokenCon.getATBalanceOfUser(walletAddr,assetIds[i]);
+      var assetDetails = assetCon.getAssetDetailsByAssetIdAndAddress(userWallet,assetIds[i]);
+      var assetQty = atokenCon.getATBalanceOfUser(userWallet,assetIds[i]);
       var ownerOfAsset = assetCon.getHolderOfAsset(assetIds[i]);
-      if (ownerOfAsset == walletAddr){
+      if (ownerOfAsset === userWallet){
       var timeOA = assetCon.getTimeStampByAssetID(assetIds[i]);
       var time1 = new Date(timeOA * 1000);
       assetTs = time1.toLocaleString();
@@ -39,19 +50,19 @@ export default class AssetView extends Component {
       var tradeDetails = txCon.getAllTx();
       var len = tradeDetails.length;
       for (i = 0; i < len; i++) {
-      if(walletAddr == tradeDetails[3][i]){
+      if(userWallet === tradeDetails[3][i]){
                 var blckNum = web3.eth.getTransactionReceipt(tradeDetails[0][i]).blockNumber;
                 var time = web3.eth.getBlock(blckNum).timestamp;
                 var time1 = new Date(time * 1000);
                 assetTs = time1.toLocaleString();
       }
     }
-    }
+  }
 
- data.push({ assetName: web3.toAscii(assetDetails[0]), pricePerAsset: assetDetails[3].c[0], quantity: assetQty.c[0], assetType: web3.toAscii(assetDetails[1]), assetTime: assetTs})
+data.push({ assetName: web3.toAscii(assetDetails[0]), pricePerAsset: assetDetails[3].c[0], quantity: assetQty.c[0], assetType: web3.toAscii(assetDetails[1]), assetTime: assetTs})
 }
 
-  this.setState({ asset: data });
+this.setState({ asset: data });
 }
 
   render() {

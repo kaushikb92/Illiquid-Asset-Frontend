@@ -4,14 +4,13 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import Modal from 'react-bootstrap/lib/Modal';
 import Web3 from 'web3'
-import { userAddr, ctokenAddr, assetAddr, atokenAddr, txAddr, atokenAbi, userAbi, ctokenAbi, txAbi, assetAbi } from './constants.js';
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
-var userCon = web3.eth.contract(userAbi).at(userAddr);
-var assetCon = web3.eth.contract(assetAbi).at(assetAddr);
-var atokenCon = web3.eth.contract(atokenAbi).at(atokenAddr);
-var ctokenCon = web3.eth.contract(ctokenAbi).at(ctokenAddr);
-var txCon = web3.eth.contract(txAbi).at(txAddr);
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
+
 var walletAddr = web3.eth.accounts[0];
+
+var userWallet;
+
 export default class MarketPlace extends Component {
     constructor(props) {
         super(props);
@@ -81,6 +80,10 @@ export default class MarketPlace extends Component {
         this.setState({ confirmExchange: true });
     }
     componentWillMount() {
+        var userId = window.localStorage.getItem('loginID');
+        var loginStatus = window.localStorage.getItem('loginStatus');
+        this.getWalletAddress(userId);
+        //userWallet = userCon.getWalletByUserID(userId);
         var data = [];
         var assetDetails = assetCon.getAllAssetDetails();
         var len = assetDetails[0].length;
@@ -88,30 +91,36 @@ export default class MarketPlace extends Component {
         for (i = 0; i < len; i++) {
             var assetQnty = atokenCon.getATBalanceOfUser(assetDetails[1][i], assetDetails[0][i]);
             var assetOwner = userCon.getUserDetailsByWallet(assetDetails[1][i]);
-            data.push({ assetName: web3.toAscii(assetDetails[3][i]), ownerName: web3.toAscii(assetOwner[0]), pricePerAsset: assetDetails[4][i].c[0], quantity: assetQnty.c[0], assetType: web3.toAscii(assetDetails[2][i]), sellerAddress: assetDetails[1][i], assetids: assetDetails[0][i] })
+            data.push({ assetId: web3.toAscii(assetDetails[0][i]), assetName: web3.toAscii(assetDetails[3][i]), ownerName: web3.toAscii(assetOwner[0]), pricePerAsset: assetDetails[4][i].c[0], quantity: assetQnty.c[0], assetType: web3.toAscii(assetDetails[2][i]), sellerAddress: assetDetails[1][i], assetids: assetDetails[0][i] })
         }
         this.setState({ assetData: data });
     }
+
+    async getWalletAddress(userId){
+        userWallet = await userCon.getWalletByUserID(userId);
+    }
+
     closeBuyAsset() {
         this.setState({ showModal: false });
     }
-    async f1(amt, aid, seller, assetAmt, assetTx, currencyTx) {
-        var x = await ctokenCon.setCTokenBalance(walletAddr, amt, { from: walletAddr, gas: 2000000 });
-        assetTx = await atokenCon.ATtransfer(aid, seller, walletAddr, assetAmt, { from: walletAddr, gas: 2000000 });
-        this.f2(amt, aid, seller, assetAmt, assetTx, currencyTx);
+    async f1(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
+        var x = await ctokenCon.setCTokenBalance(userWallet, amt, { from: walletAddr, gas: 2000000 });
+        assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
+        this.f2(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
     }
-    async f2(amt, aid, seller, assetAmt, assetTx, currencyTx) {
-        currencyTx = await ctokenCon.CTtransferFrom(walletAddr, seller, amt, { from: walletAddr, gas: 2000000 });
-        var curT = await ctokenCon.getCTBalance(walletAddr);
-        this.f3(amt, aid, seller, assetAmt, assetTx, currencyTx);
+    async f2(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
+        currencyTx = await ctokenCon.CTtransferFrom(userWallet, seller, amt, { from: walletAddr, gas: 2000000 });
+        var curT = await ctokenCon.getCTBalance(userWallet);
+        this.f3(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
     }
-    async f3(amt, aid, seller, assetAmt, assetTx, currencyTx) {
-        var txa = await assetCon.addAssetWithWalletAfterSell(walletAddr, aid, { from: walletAddr, gas: 2000000 });
-        this.f4(amt, aid, seller, assetAmt, assetTx, currencyTx);
+    async f3(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
+        var txa = await assetCon.addAssetWithWalletAfterSell(userWallet, aid, { from: walletAddr, gas: 2000000 });
+        this.f4(amt, aid, seller, assetAmt, assetTx, currencyTx,userWallet,walletAddr);
     }
-    async f4(amt, aid, seller, assetAmt, assetTx, currencyTx) {
-        var recordTx = await txCon.addTx(assetTx, currencyTx, seller, walletAddr, aid, assetAmt, amt, { from: walletAddr, gas: 2000000 });
+    async f4(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet,walletAddr) {
+        var recordTx = await txCon.addTx(assetTx, currencyTx, seller, userWallet, aid, assetAmt, amt, { from: walletAddr, gas: 2000000 });
     }
+
     startTrade() {
         var assetTx;
         var currencyTx;
@@ -119,7 +128,7 @@ export default class MarketPlace extends Component {
         var assetAmt = this.state.selectedQty;
         var seller = this.state.selectedData.sellerAddress;
         var aid = this.state.selectedData.assetids;
-        this.f1(amt, aid, seller, assetAmt, assetTx, currencyTx);
+        this.f1(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
     }
     handleCancel() {
         this.setState({
@@ -185,7 +194,7 @@ export default class MarketPlace extends Component {
                                         <br />
                                         <span>Price per Asset:{(this.state.selectedData.pricePerAsset).toLocaleString()}</span>
                                         <br />
-                                        <span>Quantity:</span><input id="model-input-box-dark" className="input-box" value={this.state.selectedQty}
+                                        <span>Volume:</span><input id="model-input-box-dark" className="input-box" value={this.state.selectedQty}
                                             onChange={this.quantityRequest} placeholder="Enter the Quantity.." type="number" min="1"></input>
                                         <br />
                                         <button className="Btn-mkt-style Button-dark-theme" onClick={this.confirmExchange} type="button" >Submit</button>
@@ -218,22 +227,22 @@ export default class MarketPlace extends Component {
                         <table className="myTable">
                             <thead className="tablehead-blc-exp">
                                 <tr id="tablerow">
+                                    <th className="tableHeading width20">Asset ID</th>
                                     <th className="tableHeading width20">Asset Name</th>
                                     <th className="tableHeading width20">Asset owner</th>
                                     <th className="tableHeading width20">Asset Type</th>
                                     <th className="tableHeading width20">Price per asset</th>
-                                    <th className="tableHeading width20">Quantity</th>
                                 </tr>
                             </thead>
                             <tbody className="tableBody-blc-exp">
                                 {
                                     this.state.assetData.map(function (emp, i) {
                                         return (<tr className="table-style-menu" key={i} value={self.state.confirmBuy} name="confirmBuy" onClick={() => self.openConfirmBuy(emp)}>
+                                            <td className="tableData width20">{emp.assetId}</td>
                                             <td className="tableData width20">{emp.assetName}</td>
                                             <td className="tableData width20">{emp.ownerName}</td>
                                             <td className="tableData width20">{emp.assetType}</td>
                                         <td id="assetprice"className="tableData width20 amtRight">{(emp.pricePerAsset).toLocaleString()}</td>
-                                            <td className="tableData width20 amtRight">{emp.quantity}</td>
                                         </tr>
                                         );
                                     })

@@ -1,9 +1,9 @@
 {
-  "name": "peoplelistui",
+  "name": "Illiquid-Assets",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "web3": "0.20.0",
+    "web3": "^0.18.2",
     "bootstrap": "^3.3.7",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

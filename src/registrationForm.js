@@ -2,14 +2,14 @@ import React from 'react';
 import hashFnv32a from './hash';
 import Web3 from 'web3'
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router'
-import { userAddr, userAbi } from './constants.js'
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 import Modal from 'react-bootstrap/lib/Modal';
 
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"))
+var userid;
 
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"))
+var userWallet;
 var walletAddr = web3.eth.accounts[0];
-
-var userCon = web3.eth.contract(userAbi).at(userAddr);
 
 class RegistrationForm extends React.Component {
   constructor() {
@@ -64,10 +64,57 @@ class RegistrationForm extends React.Component {
       this.state.password.value.toString = "";
       this.state.confirmPassword.value.toString = "";
     }
-    var userid = hashFnv32a((this.state.firstName || this.state.lastName || this.state.panID), true);
-    var tx = userCon.addNewUser(this.state.firstName, this.state.lastName, walletAddr, this.state.panID, userid, this.state.password, this.state.mobileNumber, { from: walletAddr, gas: 2000000 });
+    var fname = this.state.firstName;
+    var lname = this.state.lastName;
+    var pn = this.state.panID;
+    var pw = this.state.password;
+    var mo = this.state.mobileNumber;
+    var randomNum = hashFnv32a((this.state.firstName || this.state.lastName || this.state.panID), false);
+        var str = fname;
+        var strUp = str.toUpperCase();
+        var res = strUp.substring(0,4);
+        var res1 = randomNum.toString().substring(0,4);
+        userid = res.concat(res1);
+    this.f1(fname, lname, pn, pw, mo, userid, walletAddr);
     e.preventDefault();
+
+    console.log(userid);
   }
+
+  async f1(fname, lname, pn, pw, mo, userid, walletAddr) {
+        userWallet = web3.personal.newAccount(pw,{ from: walletAddr, gas: 2000000});
+        this.f2(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
+  }
+
+  async f2(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
+    var tx1 = web3.eth.sendTransaction({from: walletAddr, to: userWallet, value: web3.toWei(50,"Ether")});
+    console.log(tx1);
+    //window.localStorage.setItem('userWallet',userWallet);
+    //console.log("userWallet",userWallet);
+    this.f5(fname, lname, pn, pw, mo, userid, walletAddr,  userWallet);
+  }
+
+  async f5(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
+    var amt = web3.fromWei(web3.eth.getBalance(userWallet), "ether");
+    console.log(amt);
+    // if (amt = 50){
+    this.f3(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
+  // }
+  // else{
+  //   alert("error");
+  // }
+  }
+  async f4(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
+    var tx = userCon.addNewUser(this.state.firstName, this.state.lastName, userWallet, this.state.panID, userid, this.state.password, this.state.mobileNumber, { from: walletAddr, gas: 2000000 });
+    console.log(tx);
+}
+
+  async f3(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
+    var unlockStatus = web3.personal.unlockAccount(userWallet,pw);
+    //window.localStorage.setItem('loginStatus', unlockStatus);
+    this.f4(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
+  }
+
 
   render() {
     return (
@@ -113,8 +160,11 @@ class RegistrationForm extends React.Component {
         </div>
         <Modal show={this.state.showModal} onHide={this.closeModal} >
           <Modal.Header closeButton className="custom-modal" >
-            <Modal.Title>Congratulations {this.state.firstName}<br /> Registration successful !!!</Modal.Title>
-            <Link to="AssetRegister"><button id="user-regd-ok-btn" type="button" >Ok</button></Link>
+            <Modal.Title>Congratulations {this.state.firstName}<br /> Registration successful !!!
+            Your User ID is: {userid}<br />
+            Please note your User ID for login<br />
+            </Modal.Title>
+            <Link to="Home"><button id="user-regd-ok-btn" type="button" >Ok</button></Link>
           </Modal.Header>
         </Modal>
       </div>

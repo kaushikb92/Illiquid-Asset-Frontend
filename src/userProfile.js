@@ -2,31 +2,41 @@ import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router'
 import Web3 from 'web3'
-import {userAddr, ctokenAddr, userAbi, ctokenAbi } from './constants.js'
-
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"))
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 
 var walletAddr = web3.eth.accounts[0];
 
-var userCon = web3.eth.contract(userAbi).at(userAddr);
-var ctokenCon = web3.eth.contract(ctokenAbi).at(ctokenAddr);
+var userWallet;
 
 var dataBE;
 var data;
 
+
+
 class UserProfile extends React.Component {
     constructor() {
-        super();
-        this.state = { user: {} };
+        super();    
+        this.state = { user: [] };
 
     }
     componentWillMount() {
-        var dataBE = userCon.getUserDetailsByWallet(walletAddr);
-        var data = [
-            { userName1: web3.toAscii(dataBE[0]),userName2: web3.toAscii(dataBE[1]), UID: web3.toAscii(dataBE[3]), Mobile: dataBE[4].c[0], PAN: web3.toAscii(dataBE[2]) },
-        ];
+        var userId = window.localStorage.getItem('loginID');
+        var loginStatus = window.localStorage.getItem('loginStatus');
+        this.getWalletAddress(userId);
+    }
+
+    async getWalletAddress(userId){
+        userWallet = await userCon.getWalletByUserID(userId);
+        this.getData(userWallet);
+    }
+
+    async getData(userWallet){
+        var dataBE = userCon.getUserDetailsByWallet(userWallet);
+        var data = [];
+       data.push({ userName1: web3.toAscii(dataBE[0]),userName2: web3.toAscii(dataBE[1]), UID: web3.toAscii(dataBE[3]), Mobile: dataBE[4].c[0], PAN: web3.toAscii(dataBE[2]) });
         this.setState({ user: data });
     }
+
     renderDetails() {
         let c = data.userName1;
         this.setState({ userName1: c });
@@ -62,7 +72,7 @@ class UserProfile extends React.Component {
                                                 <label>UID : </label> <output id="UID" className="profile-output">{emp.UID}</output><br />
                                                 <label>Mobile no: </label><output id="Mobile no" className="profile-output">{emp.Mobile}</output><br />
                                                 <label>PAN ID:</label><output id="PAN" className="profile-output">{emp.PAN}</output><br />
-                                                <label>Your Balance:</label><output id="Balance" className="profile-output">{ctokenCon.getCTBalance(walletAddr).c[0].toLocaleString()}</output>
+                                                <label>Your Balance:</label><output id="Balance" className="profile-output">{ctokenCon.getCTBalance(userWallet).c[0].toLocaleString()}</output>
                                             </div>
                                         );
                                     })

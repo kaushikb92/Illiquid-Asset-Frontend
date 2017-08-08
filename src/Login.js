@@ -5,12 +5,12 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import RegistrationForm from './registrationForm'
 import RegisterHeading from './registerHeading'
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
-import {userAddr, userAbi} from './constants.js'
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 
 var walletAddr = web3.eth.accounts[0];
 
-var userCon = web3.eth.contract(userAbi).at(userAddr);
+var userWallet;
 
 export default class Login extends Component {
     constructor(props) {
@@ -41,13 +41,33 @@ export default class Login extends Component {
     submitClick(e) {
         // var WalletLoginSuccess = web3.personal.unlockAccount(web3.eth.accounts[0],this.state.loginpwdval);
         var contractLoginSuccess = userCon.getLogin(this.state.loginidval, this.state.loginpwdval);
+        var loginId = this.state.loginidval;
+        var pwd = this.state.loginpwdval;
+        this.f1(loginId,pwd,userWallet,contractLoginSuccess);
+    }
+
+    async f1(loginId,pwd,userWallet,contractLoginSuccess){
+        userWallet = await userCon.getWalletByUserID(loginId);
+        this.f2(loginId,pwd,userWallet,contractLoginSuccess);
+    }
+
+    async f2(loginId,pwd,userWallet,contractLoginSuccess){
+        var walletUnlockStatus = await web3.personal.unlockAccount(userWallet,pwd);
+        console.log(walletUnlockStatus);
+        this.f3(loginId,pwd,userWallet,contractLoginSuccess);
+    }
+
+    async f3(loginId,pwd,userWallet,contractLoginSuccess){
         if (contractLoginSuccess == true) {               //&& WalletLoginSuccess == true
             alert("Login success");
+            window.localStorage.setItem('loginStatus', contractLoginSuccess);
+            window.localStorage.setItem('loginID', this.state.loginidval);
         }
         else {
             alert("Login failed");
         }
     }
+
 
     render() {
 
@@ -67,7 +87,7 @@ export default class Login extends Component {
 
                 <div id="Info-box" className="col-md-5">
                     >>> Proof of Concept marketplace /exchange for the trade of illiquid instruments – based on blockchain - decentralised, distributed ledger technology.<br /><br /><br />
-                    >>> Undertaken by HCL in collaboration with Deutsche Bank
+                    >>> Undertaken by HCL {/*in collaboration with Deutsche Bank*/}
                     </div>
 
                 <div id="login-body">

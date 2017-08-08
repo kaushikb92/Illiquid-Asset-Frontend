@@ -5,13 +5,13 @@ import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 // import Exchange from './Exchange';
 import Modal from 'react-bootstrap/lib/Modal';
 import Web3 from 'web3'
-import {userAddr, ctokenAddr, txAddr, userAbi,ctokenAbi,txAbi, assetAbi, assetAddr} from './constants.js';
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
-var userCon = web3.eth.contract(userAbi).at(userAddr);
-var ctokenCon = web3.eth.contract(ctokenAbi).at(ctokenAddr);
-var txCon = web3.eth.contract(txAbi).at(txAddr);
-var assetCon = web3.eth.contract(assetAbi).at(assetAddr);
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
+
 var walletAddr = web3.eth.accounts[0];
+
+var userWallet;
+
 export default class Statement extends Component {
     constructor(props) {
         super(props);
@@ -33,13 +33,25 @@ export default class Statement extends Component {
         this.closeTradeView = this.closeTradeView.bind(this);
     }
     componentWillMount() {
+        var userId = window.localStorage.getItem('loginID');
+        var loginStatus = window.localStorage.getItem('loginStatus');
+        this.getWalletAddress(userId);
+        
+    }
+
+    async getWalletAddress(userId){
+        userWallet = await userCon.getWalletByUserID(userId);
+        this.getTx();
+    }
+    
+    async getTx(){
         var data = [];
         var tradeDetails = txCon.getAllTx();
         var len = tradeDetails.length;
         var i;
         var role1;
         for (i = 0; i < len; i++) {
-            if(walletAddr == tradeDetails[2][i]) {
+            if(userWallet == tradeDetails[2][i]) {
                 var seller = userCon.getUsernameByAddress(tradeDetails[2][i]);
                 var buyer = userCon.getUsernameByAddress(tradeDetails[3][i]);
                 var assetN = assetCon.getAssetNamebyAssetID(tradeDetails[4][i]);
@@ -49,7 +61,7 @@ export default class Statement extends Component {
                 role1 = "Sell";
             data.push({ assetTxId: tradeDetails[0][i], currencyTxId: tradeDetails[1][i], buyerName: web3.toAscii(buyer[0]), sellerName: web3.toAscii(seller[0]), tradeAssetName: web3.toAscii(assetN),tradeQty: tradeDetails[5][i].c[0], tradeAmount: tradeDetails[6][i].c[0],blockTime: time1.toLocaleString(), role: role1 })
         }
-        else if(walletAddr == tradeDetails[3][i]){
+        else if(userWallet == tradeDetails[3][i]){
                 role1 = "Buy"; 
                 var seller = userCon.getUsernameByAddress(tradeDetails[2][i]);
                 var buyer = userCon.getUsernameByAddress(tradeDetails[3][i]);

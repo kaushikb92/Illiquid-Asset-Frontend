@@ -4,15 +4,14 @@ import hashFnv32a from './hash';
 import Web3 from 'web3'
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import Modal from 'react-bootstrap/lib/Modal';
-import {assetAbi, atokenAbi, assetAddr, atokenAddr} from './constants'
+import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 
-var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"))
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"))
 
 var aName;
 var assetUid;
 
-var assetCon = web3.eth.contract(assetAbi).at(assetAddr);
-var atokenCon = web3.eth.contract(atokenAbi).at(atokenAddr);
+var userWallet;
 
 var walletAddr = web3.eth.accounts[0];
 
@@ -25,7 +24,7 @@ class AssetRegistration extends Component {
             assetQuantity: '',
             pricePerAsset: '',
             totalPrice: '',
-            assetType: 'Bonds',
+            assetType: 'Nano Stocks',
             showModal: false
         }
         this.updateState = this.updateState.bind(this);
@@ -39,21 +38,46 @@ class AssetRegistration extends Component {
         
     }
 
-        closeModal() {
+    componentWillMount(){
+        var userId = window.localStorage.getItem('loginID');
+        var loginStatus = window.localStorage.getItem('loginStatus');
+        userWallet = userCon.getWalletByUserID(userId);
+    }
+
+    closeModal() {
         this.setState({showModal : false})
     }
 
-    handleChange (e) {
-        
+    handleChange (e) {    
         this.setState({assetType:e.target.value});
     }
 
     submitClick(e) {
-        assetUid = hashFnv32a(aName, Date.now(), true);
+        var randomNum = hashFnv32a(aName, Date.now(), false);
+        var str = this.state.assetName;
+        var strUp = str.toUpperCase();
+        var res = str.substring(0,4);
+        var res1 = randomNum.toString().substring(0,4);
+        assetUid = res.concat(res1);
+        console.log(assetUid);
         this.setState({showModal: true});
-        var tx = assetCon.addNewAsset(walletAddr, this.state.assetName,this.state.assetQuantity,this.state.pricePerAsset,this.state.assetType,assetUid,{from: walletAddr, gas: 2000000 });
-        var tx1 = atokenCon.setAToken(walletAddr,assetUid,this.state.assetQuantity,{from: walletAddr, gas: 2000000 });
+        var asn = this.state.assetName;
+        var asqn = this.state.assetQuantity;
+        var ppa = this.state.pricePerAsset;
+        var at = this.state.assetType;
+        
+        this.f1(userWallet, asn,asqn,ppa,at,assetUid,walletAddr);
+                
         e.preventDefault();
+    }
+
+    async f1(userWallet, asn,asqn,ppa,at,assetUid,walletAddr){
+        var tx = await assetCon.addNewAsset(userWallet, asn,asqn,ppa,at,assetUid,{from: walletAddr, gas: 2000000 });
+        this.f2(userWallet, asn,asqn,ppa,at,assetUid,walletAddr);
+    }
+
+    async f2(userWallet, asn,asqn,ppa,at,assetUid,walletAddr){
+        var tx1 = await atokenCon.setAToken(userWallet,assetUid,asqn,{from: walletAddr, gas: 2000000 });
     }
 
     updateState(e) {
@@ -72,7 +96,7 @@ class AssetRegistration extends Component {
 
     renderSubmit() {
         if (this.state.formSub)
-        { return (<div >You have assigned with {this.state.data} CT Tokens</div>); }
+        { return (<div >Your have successfully registered {this.state.data.assetName} {this.state.data.assetType} </div>); }
         else return false;
     }
     renderTotal() {
@@ -104,7 +128,7 @@ class AssetRegistration extends Component {
                                 <label className="asset-label">Price per Asset :</label>
                                 <input className="input-box" type="text" id="input3" ref="title3" value={this.state.pricePerAsset} onChange={this.updateState2} /><br />
                                 <hr className="hr noPadding"></hr>
-                                <label className="asset-label">Quantity of Asset :</label>
+                                <label className="asset-label">Volume :</label>
                                 <input className="input-box" type="text" id="input2" ref="title2" value={this.state.assetQuantity} onChange={this.updateState1} onKeyUp={this.renderTotal} /><br />
                                 {this.renderTotal}
                                 <hr className="hr noPadding"></hr>
@@ -133,7 +157,7 @@ class AssetRegistration extends Component {
 }
 
 AssetRegistration.defaultProps = {
-   categories: ['Bonds', 'Nano Stocks', 'Penny Stocks']
+   categories: [ 'Nano Stocks', 'Penny Stocks']
    
 }
 

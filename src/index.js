@@ -11,7 +11,7 @@ import AssetRegistration from './AssetRegister'
 import AssetView from './assetView'
 import BlockExplorer from './BlockExplorer'
 import Statement from './statement'
-
+//import LogOut from './LogOut'
 
 
 ReactDOM.render((
@@ -25,7 +25,7 @@ ReactDOM.render((
          <Route path = "Statement" component = {Statement} />
          <Route path = "userProfile" component = {UserProfile} />     
          <Route path = "BlockExplorer" component = {BlockExplorer} />
-         
+         {/*<Route path = "Log Out" component = {LogOut} />*/}
 
 
       </Route>

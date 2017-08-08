@@ -20,17 +20,19 @@ export default class BlockExplorer extends Component {
     }
     componentWillMount() {
         var data = [];
+        var blockNum = web3.eth.getBlock('latest').number;
         //console.log(web3.eth.getBlock(100));
-        for (var j = 1; j <= web3.eth.getBlock(100).number; j++) {
+        for (var j = blockNum; j >= 0; j--) {
             //console.log(j);
-            var time = web3.eth.getBlock(j).timestamp;
+            var block = web3.eth.getBlock(j);
+            var time = block.timestamp;
             var time1 = new Date(time * 1000);
             var timeStamp = time1.toLocaleString();
-            if (web3.eth.getBlock(j).transactions.length > 0) {
+            if (block.transactions.length > 0) {
                 // for (var  = 0; k < web3.eth.getBlock(j).transactions.length; k++) {
-                data.push({ blockNumber: web3.eth.getBlock(j).number, transactionHash: web3.eth.getBlock(j).hash, miner: web3.eth.getBlock(j).miner, blockDiff: web3.eth.getBlock(j).difficulty.c[0], totalDiff: web3.eth.getBlock(j).totalDifficulty.c[0], nonce: web3.eth.getBlock(j).nonce, blockSize: web3.eth.getBlock(j).size, gasUsed: web3.eth.getBlock(j).gasUsed, gasLimit: web3.eth.getBlock(j).gasLimit, timestamp: timeStamp })
+                data.push({ blockNumber: block.number, transactionHash: block.hash, miner: block.miner, blockDiff: block.difficulty.c[0], totalDiff: block.totalDifficulty.c[0], nonce: block.nonce, blockSize: block.size, gasUsed: block.gasUsed, gasLimit: block.gasLimit, timestamp: timeStamp })
                 //console.log(this.state.transactionDetails);
-                console.log(web3.eth.getBlock(j));
+                console.log(block);
 
 
             }    //console.log(web3.eth.getBlock(j).transactions);
