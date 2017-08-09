@@ -106,7 +106,7 @@ export default class Login extends Component {
                                 <button id="dlt-btn-userid" className="delete-button login-delete-btn" onClick={this.resetloginPassword} type="button">X</button>
                                 <hr className="hr-width hr noPadding"></hr>
 
-                                <Link to="userProfile"><button className="Button-style" id="user-login-button" type="button" onClick={this.submitClick}>login</button><br /></Link>
+                                <Link to="assetRegister"><button className="Button-style" id="user-login-button" type="button" onClick={this.submitClick}>login</button><br /></Link>
                                 <div id="no-account-box">
                                     <span>New User?</span>
                                     <a onClick={this.openRegisterWindow}> Click here to Register</a><br />

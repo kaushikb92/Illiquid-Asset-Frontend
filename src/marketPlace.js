@@ -21,9 +21,7 @@ export default class MarketPlace extends Component {
             confirmExchange: false,
             selectedData: {},
             // selectedQty: ,
-            handleOpenCard: false,
-            sellerAddress: '',
-            assetids: ''
+            handleOpenCard: false
         }
         this.openConfirmBuy = this.openConfirmBuy.bind(this);
         this.confirmExchange = this.confirmExchange.bind(this);
@@ -103,32 +101,30 @@ export default class MarketPlace extends Component {
     closeBuyAsset() {
         this.setState({ showModal: false });
     }
-    async f1(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
+    async f1(amt, aid, seller, assetAmt,  userWallet, walletAddr) {
         var x = await ctokenCon.setCTokenBalance(userWallet, amt, { from: walletAddr, gas: 2000000 });
-        assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
-        this.f2(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
+        var assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
+        this.f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
     }
-    async f2(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
-        currencyTx = await ctokenCon.CTtransferFrom(userWallet, seller, amt, { from: walletAddr, gas: 2000000 });
-        var curT = await ctokenCon.getCTBalance(userWallet);
+    async f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr) {
+        var currencyTx = await ctokenCon.CTtransferFrom(userWallet, seller, amt, { from: walletAddr, gas: 2000000 });
+        // var curT = await ctokenCon.getCTBalance(userWallet);
         this.f3(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
     }
     async f3(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
-        var txa = await assetCon.addAssetWithWalletAfterSell(userWallet, aid, { from: walletAddr, gas: 2000000 });
+        await assetCon.addAssetWithWalletAfterSell(userWallet, aid, { from: walletAddr, gas: 2000000 });
         this.f4(amt, aid, seller, assetAmt, assetTx, currencyTx,userWallet,walletAddr);
     }
     async f4(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet,walletAddr) {
-        var recordTx = await txCon.addTx(assetTx, currencyTx, seller, userWallet, aid, assetAmt, amt, { from: walletAddr, gas: 2000000 });
+        await txCon.addTx(assetTx, currencyTx, seller, userWallet, aid, assetAmt, amt, { from: walletAddr, gas: 2000000 });
     }
 
     startTrade() {
-        var assetTx;
-        var currencyTx;
         var amt = this.state.selectedQty * this.state.selectedData.pricePerAsset;
         var assetAmt = this.state.selectedQty;
         var seller = this.state.selectedData.sellerAddress;
         var aid = this.state.selectedData.assetids;
-        this.f1(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
+        this.f1(amt, aid, seller, assetAmt, userWallet, walletAddr);
     }
     handleCancel() {
         this.setState({
