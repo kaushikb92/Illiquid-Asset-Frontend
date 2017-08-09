@@ -6,7 +6,7 @@ import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import RegistrationForm from './registrationForm'
 import RegisterHeading from './registerHeading'
 //var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
-import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
+import { web3, userCon, assetCon, atokenCon, ctokenCon, txCon } from './constants';
 
 var walletAddr = web3.eth.accounts[0];
 
@@ -25,7 +25,9 @@ export default class Login extends Component {
         this.submitClick = this.submitClick.bind(this);
         this.updateStateALL = this.updateStateALL.bind(this);
     }
-
+    openLoginWindow() {
+        this.setState({ openRegister: false })
+    }
     openRegisterWindow() {
         this.setState({ openRegister: true })
     }
@@ -43,21 +45,21 @@ export default class Login extends Component {
         var contractLoginSuccess = userCon.getLogin(this.state.loginidval, this.state.loginpwdval);
         var loginId = this.state.loginidval;
         var pwd = this.state.loginpwdval;
-        this.f1(loginId,pwd,userWallet,contractLoginSuccess);
+        this.f1(loginId, pwd, userWallet, contractLoginSuccess);
     }
 
-    async f1(loginId,pwd,userWallet,contractLoginSuccess){
+    async f1(loginId, pwd, userWallet, contractLoginSuccess) {
         userWallet = await userCon.getWalletByUserID(loginId);
-        this.f2(loginId,pwd,userWallet,contractLoginSuccess);
+        this.f2(loginId, pwd, userWallet, contractLoginSuccess);
     }
 
-    async f2(loginId,pwd,userWallet,contractLoginSuccess){
-        var walletUnlockStatus = await web3.personal.unlockAccount(userWallet,pwd);
+    async f2(loginId, pwd, userWallet, contractLoginSuccess) {
+        var walletUnlockStatus = await web3.personal.unlockAccount(userWallet, pwd);
         console.log(walletUnlockStatus);
-        this.f3(loginId,pwd,userWallet,contractLoginSuccess);
+        this.f3(loginId, pwd, userWallet, contractLoginSuccess);
     }
 
-    async f3(loginId,pwd,userWallet,contractLoginSuccess){
+    async f3(loginId, pwd, userWallet, contractLoginSuccess) {
         if (contractLoginSuccess == true) {               //&& WalletLoginSuccess == true
             alert("Login success");
             window.localStorage.setItem('loginStatus', contractLoginSuccess);
@@ -75,7 +77,7 @@ export default class Login extends Component {
             return (
                 <div>
                     <RegisterHeading />
-                    <RegistrationForm />
+                    <RegistrationForm openLogin={this.openLoginWindow.bind(this)} />
                 </div>
             )
         }
@@ -88,7 +90,7 @@ export default class Login extends Component {
                 <div id="Info-box" className="col-md-5">
                     >>> Proof of Concept marketplace /exchange for the trade of illiquid instruments – based on blockchain - decentralised, distributed ledger technology.<br /><br /><br />
                     >>> Undertaken by HCL {/*in collaboration with Deutsche Bank*/}
-                    </div>
+                </div>
 
                 <div id="login-body">
                     <div id="Register-box" className="col-md-5">

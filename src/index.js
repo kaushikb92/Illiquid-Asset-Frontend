@@ -18,7 +18,7 @@ ReactDOM.render((
    <Router history = {browserHistory}>
       <Route path = "/" component = {App}>
          <IndexRoute component = {Home} />
-         <Route path = "Home" component = {Home} />
+         <Route path = "/Home" component = {Home} />
          <Route path = "assetRegister" component = {AssetRegistration} />
          <Route path = "marketPlace" component = {MarketPlace} />
          <Route path = "AssetView" component = {AssetView} />

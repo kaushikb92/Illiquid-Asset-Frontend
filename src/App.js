@@ -82,7 +82,7 @@ this.state={
                 <Link to="Statement"><button className="Button-style-menu ledger-icon" id="Statement" >Trade Ledger</button></Link><br />
                 <Link to="BlockExplorer"><button className="Button-style-menu ethereum-icon" id="BlockExplorer" >BlockExplorer</button></Link><br />  
                 <Link to="UserProfile"><button className="Button-style-menu user-icon" id="User-Profile-button" >Profile</button></Link><br />
-                <Link to="home"><button className="Button-style-menu user-icon" id="User-Profile-button" onClick={this.LogOut}>Log Out</button></Link><br />
+                <Link to="home"><button className="Button-style-menu logout-icon" id="User-Profile-button" onClick={this.LogOut}>Log Out</button></Link><br />
               </div>
             </div>
 

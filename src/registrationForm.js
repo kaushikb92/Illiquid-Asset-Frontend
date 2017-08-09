@@ -12,8 +12,8 @@ var userWallet;
 var walletAddr = web3.eth.accounts[0];
 
 class RegistrationForm extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       firstName: '',
       lastName: '',
@@ -164,7 +164,7 @@ class RegistrationForm extends React.Component {
             Your User ID is: {userid}<br />
             Please note your User ID for login<br />
             </Modal.Title>
-            <Link to="Home"><button id="user-regd-ok-btn" type="button" >Ok</button></Link>
+           <button id="user-regd-ok-btn" type="button" onClick={this.props.openLogin}>Ok</button>
           </Modal.Header>
         </Modal>
       </div>

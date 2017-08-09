@@ -95,7 +95,7 @@
   background-position: 189px 8px;;
 }
 .ethereum-icon {
-    background-image: url('./images/ethereum.bmp');
+  background-image: url('./images/ethereum.bmp');
   background-size: 17px 25px;
   padding-left: 34px;
   background-repeat: no-repeat;
@@ -107,6 +107,20 @@
   padding-left: 34px;
   background-repeat: no-repeat;
   background-position: 191px 8px;;
+}
+.logout-icon {
+  background-image: url('./images/logout.bmp');
+  background-size: 24px 25px;
+  padding-left: 34px;
+  background-repeat: no-repeat;
+  background-position: 187px 8px;
+}
+.logout-icon:hover{
+  background-image: url('./images/logout1.bmp');
+  background-size: 24px 25px;
+  padding-left: 34px;
+  background-repeat: no-repeat;
+  background-position: 187px 8px;
 }
 #header {
   background: #002F40;
