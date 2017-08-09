@@ -149,6 +149,7 @@ class AssetRegistration extends Component {
                 <Modal show={this.state.showModal} onHide={this.closeModal} >
                                 <Modal.Header closeButton className="custom-modal" >
                                     <Modal.Title>Congratulations !!! <br /> Registration of {this.state.assetName} done successfully </Modal.Title>
+                                    <Link to="marketPlace"><button id="user-regd-ok-btn" type="button">Ok</button></Link>
                 </Modal.Header>
                 </Modal>
             </div>
