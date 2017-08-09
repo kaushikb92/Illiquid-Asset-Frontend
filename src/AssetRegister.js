@@ -53,7 +53,7 @@ class AssetRegistration extends Component {
     }
 
     submitClick(e) {
-        var randomNum = hashFnv32a(aName, Date.now(), false);
+        var randomNum = hashFnv32a(this.state.assetName||Date.now(), false);
         var str = this.state.assetName;
         var strUp = str.toUpperCase();
         var res = str.substring(0,4);
