@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import RegistrationForm from './registrationForm'
 import RegisterHeading from './registerHeading'
+import Modal from 'react-bootstrap/lib/Modal';
 //var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
 import { web3, userCon, assetCon, atokenCon, ctokenCon, txCon } from './constants';
 
@@ -18,12 +19,21 @@ export default class Login extends Component {
 
         this.state = {
             openRegister: false,
+            showModal: false
         }
         this.openRegisterWindow = this.openRegisterWindow.bind(this);
         this.resetloginUserID = this.resetloginUserID.bind(this);
         this.resetloginPassword = this.resetloginPassword.bind(this);
         this.submitClick = this.submitClick.bind(this);
         this.updateStateALL = this.updateStateALL.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+    }
+    closeModal() {
+        this.setState({
+            loginFailed: false,
+            loginSuccess: false,
+            showModal: false
+        })
     }
     openLoginWindow() {
         this.setState({ openRegister: false })
@@ -45,34 +55,62 @@ export default class Login extends Component {
         var contractLoginSuccess = userCon.getLogin(this.state.loginidval, this.state.loginpwdval);
         var loginId = this.state.loginidval;
         var pwd = this.state.loginpwdval;
-        this.f1(loginId, pwd, userWallet, contractLoginSuccess);
+        this.f1(loginId, pwd, contractLoginSuccess);
     }
 
-    async f1(loginId, pwd, userWallet, contractLoginSuccess) {
+    async f1(loginId, pwd, contractLoginSuccess) {
         userWallet = await userCon.getWalletByUserID(loginId);
-        this.f2(loginId, pwd, userWallet, contractLoginSuccess);
+        this.f3(loginId, pwd, userWallet, contractLoginSuccess);
     }
 
-    async f2(loginId, pwd, userWallet, contractLoginSuccess) {
+    async f2(pwd, userWallet) {
         var walletUnlockStatus = await web3.personal.unlockAccount(userWallet, pwd);
         console.log(walletUnlockStatus);
-        this.f3(loginId, pwd, userWallet, contractLoginSuccess);
     }
 
     async f3(loginId, pwd, userWallet, contractLoginSuccess) {
         if (contractLoginSuccess == true) {               //&& WalletLoginSuccess == true
-            alert("Login success");
+            // alert("Login success");
+            this.setState({
+                loginSuccess: true,
+                showModal: true
+            })
             window.localStorage.setItem('loginStatus', contractLoginSuccess);
-            window.localStorage.setItem('loginID', this.state.loginidval);
+            window.localStorage.setItem('loginID', loginId);
+            this.f2( pwd, userWallet);
         }
         else {
-            alert("Login failed");
+            // alert("Login failed");           
+            this.setState({
+                loginFailed: true,
+                showModal: true
+            })
         }
     }
 
 
     render() {
 
+        if (this.state.loginSuccess) {
+            return (
+                <Modal show={this.state.showModal} onhide={this.closeModal}>
+                    <Modal.Header closeButton className="custom-modal" >
+                        <Modal.Title>Congratulations <br /> Login successful !!!</Modal.Title>
+                        <Link to="marketPlace"><button id="user-regd-ok-btn" type="button">Ok</button></Link>
+                    </Modal.Header>
+                </Modal>
+            )
+        }
+        if (this.state.loginFailed) {
+            return (
+                <Modal show={this.state.showModal} onhide={this.closeModal}>
+                    <Modal.Header closeButton className="custom-modal" >
+                        <Modal.Title>Login failed<br /> Please check Userid or Password</Modal.Title>
+                        <button id="user-regd-ok-btn" type="button" onClick={this.closeModal}>Ok</button>
+                    </Modal.Header>
+                </Modal>
+            )
+        }
         if (this.state.openRegister) {
             return (
                 <div>
@@ -106,7 +144,7 @@ export default class Login extends Component {
                                 <button id="dlt-btn-userid" className="delete-button login-delete-btn" onClick={this.resetloginPassword} type="button">X</button>
                                 <hr className="hr-width hr noPadding"></hr>
 
-                                <Link to="assetRegister"><button className="Button-style" id="user-login-button" type="button" onClick={this.submitClick}>login</button><br /></Link>
+                                <button className="Button-style" id="user-login-button" type="button" onClick={this.submitClick}>login</button><br />
                                 <div id="no-account-box">
                                     <span>New User?</span>
                                     <a onClick={this.openRegisterWindow}> Click here to Register</a><br />

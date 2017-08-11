@@ -82,21 +82,20 @@ class RegistrationForm extends React.Component {
   }
 
   async f1(fname, lname, pn, pw, mo, userid, walletAddr) {
-        userWallet = web3.personal.newAccount(pw,{ from: walletAddr, gas: 2000000});
+        userWallet = await web3.personal.newAccount(pw,{ from: walletAddr, gas: 2000000});
         this.f2(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
   }
 
   async f2(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
-    var tx1 = web3.eth.sendTransaction({from: walletAddr, to: userWallet, value: web3.toWei(50,"Ether")});
-    console.log(tx1);
+    await web3.eth.sendTransaction({from: walletAddr, to: userWallet, value: web3.toWei(50,"Ether")});
+    //console.log(tx1);
     //window.localStorage.setItem('userWallet',userWallet);
     //console.log("userWallet",userWallet);
     this.f5(fname, lname, pn, pw, mo, userid, walletAddr,  userWallet);
   }
 
   async f5(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
-    var amt = web3.fromWei(web3.eth.getBalance(userWallet), "ether");
-    console.log(amt);
+    await web3.fromWei(web3.eth.getBalance(userWallet), "ether");
     // if (amt = 50){
     this.f3(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
   // }
@@ -105,12 +104,12 @@ class RegistrationForm extends React.Component {
   // }
   }
   async f4(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
-    var tx = userCon.addNewUser(this.state.firstName, this.state.lastName, userWallet, this.state.panID, userid, this.state.password, this.state.mobileNumber, { from: walletAddr, gas: 2000000 });
-    console.log(tx);
+    await userCon.addNewUser(this.state.firstName, this.state.lastName, userWallet, this.state.panID, userid, this.state.password, this.state.mobileNumber, { from: walletAddr, gas: 2000000 });
+    //console.log(tx);
 }
 
   async f3(fname, lname, pn, pw, mo, userid, walletAddr, userWallet){
-    var unlockStatus = web3.personal.unlockAccount(userWallet,pw);
+    await web3.personal.unlockAccount(userWallet,pw);
     //window.localStorage.setItem('loginStatus', unlockStatus);
     this.f4(fname, lname, pn, pw, mo, userid, walletAddr, userWallet);
   }

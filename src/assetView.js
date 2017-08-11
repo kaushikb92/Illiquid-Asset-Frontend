@@ -22,7 +22,6 @@ export default class AssetView extends Component {
        var userId = window.localStorage.getItem('loginID');
     var loginStatus = window.localStorage.getItem('loginStatus');
     this.getWalletAddress(userId);
-    
 }
 
 async getWalletAddress(userId){
@@ -41,23 +40,23 @@ var data =[] ;
       var assetDetails = assetCon.getAssetDetailsByAssetIdAndAddress(userWallet,assetIds[i]);
       var assetQty = atokenCon.getATBalanceOfUser(userWallet,assetIds[i]);
       var ownerOfAsset = assetCon.getHolderOfAsset(assetIds[i]);
-      if (ownerOfAsset === userWallet){
+      //if (ownerOfAsset === userWallet){
       var timeOA = assetCon.getTimeStampByAssetID(assetIds[i]);
       var time1 = new Date(timeOA * 1000);
       assetTs = time1.toLocaleString();
-    }
-    else{
-      var tradeDetails = txCon.getAllTx();
-      var len = tradeDetails.length;
-      for (i = 0; i < len; i++) {
-      if(userWallet === tradeDetails[3][i]){
-                var blckNum = web3.eth.getTransactionReceipt(tradeDetails[0][i]).blockNumber;
-                var time = web3.eth.getBlock(blckNum).timestamp;
-                var time1 = new Date(time * 1000);
-                assetTs = time1.toLocaleString();
-      }
-    }
-  }
+    // }
+    // else{
+    //   var tradeDetails = txCon.getAllTx();
+    //   var len = tradeDetails.length;
+    //   for (i = 0; i < len; i++) {
+    //   if(userWallet === tradeDetails[3][i]){
+    //             var blckNum = web3.eth.getTransactionReceipt(tradeDetails[0][i]).blockNumber;
+    //             var time = web3.eth.getBlock(blckNum).timestamp;
+    //             var time1 = new Date(time * 1000);
+    //             assetTs = time1.toLocaleString();
+    //   }
+    // }
+  //}
 
 data.push({ assetName: web3.toAscii(assetDetails[0]), pricePerAsset: assetDetails[3].c[0], quantity: assetQty.c[0], assetType: web3.toAscii(assetDetails[1]), assetTime: assetTs})
 }

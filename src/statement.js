@@ -41,10 +41,10 @@ export default class Statement extends Component {
 
     async getWalletAddress(userId){
         userWallet = await userCon.getWalletByUserID(userId);
-        this.getTx();
+        this.getTx(userWallet);
     }
     
-    async getTx(){
+    async getTx(userWallet){
         var data = [];
         var tradeDetails = txCon.getAllTx();
         var len = tradeDetails.length;

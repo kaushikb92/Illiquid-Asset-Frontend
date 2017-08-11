@@ -41,8 +41,13 @@ class AssetRegistration extends Component {
     componentWillMount(){
         var userId = window.localStorage.getItem('loginID');
         var loginStatus = window.localStorage.getItem('loginStatus');
-        userWallet = userCon.getWalletByUserID(userId);
-    }
+        this.getWalletAddress(userId);
+    
+}
+
+async getWalletAddress(userId){
+        userWallet = await userCon.getWalletByUserID(userId);
+}
 
     closeModal() {
         this.setState({showModal : false})
@@ -73,11 +78,13 @@ class AssetRegistration extends Component {
 
     async f1(userWallet, asn,asqn,ppa,at,assetUid,walletAddr){
         var tx = await assetCon.addNewAsset(userWallet, asn,asqn,ppa,at,assetUid,{from: walletAddr, gas: 2000000 });
+        console.log(tx)
         this.f2(userWallet, asn,asqn,ppa,at,assetUid,walletAddr);
     }
 
     async f2(userWallet, asn,asqn,ppa,at,assetUid,walletAddr){
         var tx1 = await atokenCon.setAToken(userWallet,assetUid,asqn,{from: walletAddr, gas: 2000000 });
+        console.log(tx1)
     }
 
     updateState(e) {

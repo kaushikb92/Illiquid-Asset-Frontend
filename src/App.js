@@ -21,10 +21,10 @@ componentWillMount(){
       loginStatus: window.localStorage.getItem('loginStatus')
     }
     var userId = window.localStorage.getItem('loginID');
-    this.getWalletAddress(userWallet,userId);
+    this.getWalletAddress(userId);
 }
 
-async getWalletAddress(userWallet,userId){
+async getWalletAddress(userId){
     userWallet = await userCon.getWalletByUserID(userId);
 }
 
