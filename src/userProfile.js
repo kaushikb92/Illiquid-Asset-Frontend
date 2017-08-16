@@ -71,7 +71,7 @@ class UserProfile extends React.Component {
                                                 <label>User Name :</label><output id="userName" className="profile-output">{emp.userName1}{' '}{emp.userName2}</output><br />
                                                 <label>UID : </label> <output id="UID" className="profile-output">{emp.UID}</output><br />
                                                 <label>Mobile no: </label><output id="Mobile no" className="profile-output">{emp.Mobile}</output><br />
-                                                <label>DB Account No:</label><output id="PAN" className="profile-output">{emp.acc}</output><br />
+                                                <label>DB A/C No:</label><output id="PAN" className="profile-output">{emp.acc.c[0]}</output><br />
                                                 <label>Your Balance:</label><output id="Balance" className="profile-output">{ctokenCon.getCTBalance(userWallet).c[0].toLocaleString()}</output>
                                             </div>
                                         );

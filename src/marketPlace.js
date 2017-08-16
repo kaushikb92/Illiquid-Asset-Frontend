@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import Modal from 'react-bootstrap/lib/Modal';
-import Web3 from 'web3'
 import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
 //var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
 
@@ -104,7 +103,7 @@ export default class MarketPlace extends Component {
     async f1(amt, aid, seller, assetAmt,  userWallet, walletAddr) {
         var x = await ctokenCon.setCTokenBalance(userWallet, amt, { from: walletAddr, gas: 2000000 });
         var assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
-        this.f3(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
+        this.f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
     }
     async f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr) {
         var currencyTx = await ctokenCon.CTtransferFrom(userWallet, seller, amt, { from: walletAddr, gas: 2000000 });
