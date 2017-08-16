@@ -656,15 +656,13 @@ outline: none;
   color: white;
   font-style: Calibri;
 }
-#exchange-ok-btn{
-  
-  margin-left: 80px;
-  margin-top: 20px;
+#exchange-ok-btn{  
+  margin-left: 35px;
+  margin-top: 30px;
 }
 #exchange-cancel-btn{
-  display: inline-block;
-  margin-left: 80px;
-  margin-top: 20px;
+  margin-left: 35px;
+  margin-top: 30px;
 }
 #card-ok-btn{
   margin-left: 95px;

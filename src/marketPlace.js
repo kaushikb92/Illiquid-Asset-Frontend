@@ -141,10 +141,14 @@ export default class MarketPlace extends Component {
                         <span id="Heading-name">Exchange ></span>
                     </div>
                     <div id="exchange-box-right" className="col-md-5 exchange-box">
+<div style={{ textAlign : 'center' }}>
             <h5> You have selected <strong>{this.state.selectedQty} </strong>assets of {this.state.selectedData.assetName} {this.state.selectedData.assetType} <br />
             The total amount to be deducted from your account is {(this.state.selectedQty * this.state.selectedData.pricePerAsset).toLocaleString()}</h5>
         
-                        <h5> Do you want to proceed ???</h5>
+                        <h5 style={{ marginTop: '30px'}}> Do you want to proceed ???</h5>
+
+</div>
+
                         <form onSubmit={this.handleSubmit.bind(this)}>
                             <Link to="statement"><button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >Yes</button></Link>
                             <button id="exchange-cancel-btn" className="Button-style" type="button" onClick={this.handleCancel}>No</button>
