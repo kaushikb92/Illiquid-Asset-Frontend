@@ -64,12 +64,14 @@ class RegistrationForm extends React.Component {
       this.state.password.value.toString = "";
       this.state.confirmPassword.value.toString = "";
     }
-    var fname = this.state.firstName;
-    var lname = this.state.lastName;
-    var pn = this.state.panID;
+     var name = this.state.firstName.concat(this.state.lastName);
+    // var lname = this.state.lastName;
+    //var pn = this.state.panID;
     var pw = this.state.password;
+   
     var mo = this.state.mobileNumber;
-    var randomNum = hashFnv32a((this.state.firstName || this.state.lastName || this.state.panID), false);
+     var hVar = mo.concat(name);
+    var randomNum = hashFnv32a(hVar, false);
         var str = fname;
         var strUp = str.toUpperCase();
         var res = strUp.substring(0,4);

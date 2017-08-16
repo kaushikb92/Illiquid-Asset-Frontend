@@ -104,7 +104,7 @@ export default class MarketPlace extends Component {
     async f1(amt, aid, seller, assetAmt,  userWallet, walletAddr) {
         var x = await ctokenCon.setCTokenBalance(userWallet, amt, { from: walletAddr, gas: 2000000 });
         var assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
-        this.f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
+        this.f3(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
     }
     async f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr) {
         var currencyTx = await ctokenCon.CTtransferFrom(userWallet, seller, amt, { from: walletAddr, gas: 2000000 });

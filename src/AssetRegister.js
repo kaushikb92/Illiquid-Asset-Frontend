@@ -58,7 +58,8 @@ async getWalletAddress(userId){
     }
 
     submitClick(e) {
-        var randomNum = hashFnv32a(this.state.assetName||Date.now(), false);
+        var hVar = this.state.assetName.concat(Date.now());
+        var randomNum = hashFnv32a(hVar, false);
         var str = this.state.assetName;
         var strUp = str.toUpperCase();
         var res = str.substring(0,4);

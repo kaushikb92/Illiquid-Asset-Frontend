@@ -33,7 +33,7 @@ class UserProfile extends React.Component {
     async getData(userWallet){
         var dataBE = userCon.getUserDetailsByWallet(userWallet);
         var data = [];
-       data.push({ userName1: web3.toAscii(dataBE[0]),userName2: web3.toAscii(dataBE[1]), UID: web3.toAscii(dataBE[3]), Mobile: dataBE[4].c[0], PAN: web3.toAscii(dataBE[2]) });
+       data.push({ userName1: web3.toAscii(dataBE[0]),userName2: web3.toAscii(dataBE[1]), UID: web3.toAscii(dataBE[2]), Mobile: dataBE[4].c[0], acc: dataBE[3] });
         this.setState({ user: data });
     }
 
@@ -71,7 +71,7 @@ class UserProfile extends React.Component {
                                                 <label>User Name :</label><output id="userName" className="profile-output">{emp.userName1}{' '}{emp.userName2}</output><br />
                                                 <label>UID : </label> <output id="UID" className="profile-output">{emp.UID}</output><br />
                                                 <label>Mobile no: </label><output id="Mobile no" className="profile-output">{emp.Mobile}</output><br />
-                                                <label>PAN ID:</label><output id="PAN" className="profile-output">{emp.PAN}</output><br />
+                                                <label>DB Account No:</label><output id="PAN" className="profile-output">{emp.acc}</output><br />
                                                 <label>Your Balance:</label><output id="Balance" className="profile-output">{ctokenCon.getCTBalance(userWallet).c[0].toLocaleString()}</output>
                                             </div>
                                         );
