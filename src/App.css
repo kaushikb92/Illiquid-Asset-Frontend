@@ -657,10 +657,12 @@ outline: none;
   font-style: Calibri;
 }
 #exchange-ok-btn{
+  
   margin-left: 80px;
   margin-top: 20px;
 }
 #exchange-cancel-btn{
+  display: inline-block;
   margin-left: 80px;
   margin-top: 20px;
 }
