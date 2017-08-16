@@ -92,7 +92,7 @@ this.setState({ asset: data });
                 <th className="tableHeading width20">Asset Type</th>
                 <th className="tableHeading width20">Price per asset</th>
                 <th className="tableHeading width20">Quantity</th>
-                <th className="tableHeading width20">Time Stamp</th>
+                <th className="tableHeading width20">Registered on</th>
 
 
               </tr>
