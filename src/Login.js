@@ -145,10 +145,10 @@ export default class Login extends Component {
                                 <hr className="hr-width hr noPadding"></hr>
 
                                 <button className="Button-style" id="user-login-button" type="button" onClick={this.submitClick}>login</button><br />
-                                <div id="no-account-box">
+                                {/*<div id="no-account-box">
                                     <span>New User?</span>
                                     <a onClick={this.openRegisterWindow}> Click here to Register</a><br />
-                                </div>
+                                </div>*/}
                             </form>
                         </div>
                     </div>

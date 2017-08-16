@@ -145,7 +145,7 @@ export default class MarketPlace extends Component {
                         <h5> To proceed with the transaction click <strong>OK</strong></h5>
                         <h5> Click on <strong>Cancel</strong> to abort transaction and roll back to Marketplace  </h5>
                         <form onSubmit={this.handleSubmit.bind(this)}>
-                            <button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.handleOpenCard} >OK</button>
+                            <button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >OK</button>
                             <button id="exchange-cancel-btn" className="Button-style" type="button" onClick={this.handleCancel}>Cancel</button>
                         </form>
                         {this.renderSubmit()}
@@ -153,7 +153,7 @@ export default class MarketPlace extends Component {
                 </div>
             );
         }
-        if (this.state.handleOpenCard) {
+        /*if (this.state.handleOpenCard) {
             return (
                 <div>
                     <div id="header">
@@ -169,7 +169,7 @@ export default class MarketPlace extends Component {
                     </div>
                 </div>
             );
-        }
+        }*/
         if (this.state.openConfirmBuy) {
             return (
                 <div className="modal fade" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -212,13 +212,13 @@ export default class MarketPlace extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div>
+                    {/*<div>
                         <input className="assetSearch" type="text" placeholder="Search..."
                             value={this.props.filterText}
                             ref="filterTextInput"
                             onChange={this.handleChange}
                         />
-                    </div>
+                    </div>*/}
                     <div className="tablediv">
                         <table className="myTable">
                             <thead className="tablehead-blc-exp">
