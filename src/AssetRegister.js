@@ -62,7 +62,7 @@ async getWalletAddress(userId){
         var randomNum = hashFnv32a(hVar, false);
         var str = this.state.assetName;
         var strUp = str.toUpperCase();
-        var res = str.substring(0,4);
+        var res = strUp.substring(0,4);
         var res1 = randomNum.toString().substring(0,4);
         assetUid = res.concat(res1);
         console.log(assetUid);
