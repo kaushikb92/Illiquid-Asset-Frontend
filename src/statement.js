@@ -47,7 +47,7 @@ export default class Statement extends Component {
     async getTx(userWallet){
         var data = [];
         var tradeDetails = txCon.getAllTx();
-        var len = tradeDetails.length;
+        var len = tradeDetails[0].length;
         var i;
         var role1;
         for (i = 0; i < len; i++) {
