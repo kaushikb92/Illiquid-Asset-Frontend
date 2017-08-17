@@ -822,3 +822,7 @@ outline: none;
 #assetprice{
   padding-right: 48px;
 }
+.modal-wrapper {
+  display: block;
+  position: relative;
+}

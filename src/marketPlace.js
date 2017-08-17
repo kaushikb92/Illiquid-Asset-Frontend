@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
 import Modal from 'react-bootstrap/lib/Modal';
-import {web3, userCon, assetCon, atokenCon, ctokenCon, txCon} from './constants';
+import { web3, userCon, assetCon, atokenCon, ctokenCon, txCon } from './constants';
 //var web3 = new Web3(new Web3.providers.HttpProvider("http://cil-blockchain1.uksouth.cloudapp.azure.com/api"));
 
 var walletAddr = web3.eth.accounts[0];
@@ -19,14 +19,12 @@ export default class MarketPlace extends Component {
             openConfirmBuy: false,
             confirmExchange: false,
             selectedData: {},
-            // selectedQty: ,
-            handleOpenCard: false
+            waitNotification: false,
         }
         this.openConfirmBuy = this.openConfirmBuy.bind(this);
         this.confirmExchange = this.confirmExchange.bind(this);
         this.quantityRequest = this.quantityRequest.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.handleOpenCard = this.handleOpenCard.bind(this);
         this.startTrade = this.startTrade.bind(this);
         this.closeConfirmBuy = this.closeConfirmBuy.bind(this);
     }
@@ -66,13 +64,9 @@ export default class MarketPlace extends Component {
             showModal: false,
             openConfirmBuy: false,
             confirmExchange: false,
-            handleOpenCard: false,
         });
     }
-    handleOpenCard() {
-        this.setState({ handleOpenCard: true });
-        this.setState({ confirmExchange: false });
-    }
+
     confirmExchange() {
         this.setState({ confirmExchange: true });
     }
@@ -95,14 +89,14 @@ export default class MarketPlace extends Component {
         this.setState({ assetData: data });
     }
 
-    async getWalletAddress(userId){
+    async getWalletAddress(userId) {
         userWallet = await userCon.getWalletByUserID(userId);
     }
 
     closeBuyAsset() {
         this.setState({ showModal: false });
     }
-    async f1(amt, aid, seller, assetAmt,  userWallet, walletAddr) {
+    async f1(amt, aid, seller, assetAmt, userWallet, walletAddr) {
         var x = await ctokenCon.setCTokenBalance(userWallet, amt, { from: walletAddr, gas: 2000000 });
         var assetTx = await atokenCon.ATtransfer(aid, seller, userWallet, assetAmt, { from: walletAddr, gas: 2000000 });
         this.f2(amt, aid, seller, assetAmt, assetTx, userWallet, walletAddr);
@@ -114,13 +108,16 @@ export default class MarketPlace extends Component {
     }
     async f3(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
         await assetCon.addAssetWithWalletAfterSell(userWallet, aid, { from: walletAddr, gas: 2000000 });
-        this.f4(amt, aid, seller, assetAmt, assetTx, currencyTx,userWallet,walletAddr);
+        this.f4(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr);
     }
-    async f4(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet,walletAddr) {
+    async f4(amt, aid, seller, assetAmt, assetTx, currencyTx, userWallet, walletAddr) {
         await txCon.addTx(assetTx, currencyTx, seller, userWallet, aid, assetAmt, amt, { from: walletAddr, gas: 2000000 });
     }
 
     startTrade() {
+        this.setState({
+            waitNotification: true
+        })
         var amt = this.state.selectedQty * this.state.selectedData.pricePerAsset;
         var assetAmt = this.state.selectedQty;
         var seller = this.state.selectedData.sellerAddress;
@@ -130,11 +127,38 @@ export default class MarketPlace extends Component {
     handleCancel() {
         this.setState({
             confirmExchange: false,
-            openConfirmBuy: false,
-            handleOpenCard: false
+            openConfirmBuy: false
         })
     }
     render() {
+
+        {
+            this.state.waitNotification &&
+                <div className="modal-wrapper modal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">Confirmation</h4>
+                            </div>
+                            <div className="modal-body">
+                                {
+                                    <p>
+                                        Your transaction may take 13-15 sec <br />
+                                        Please reload your browser after 15 sec to get your trade reflected in your ledger<br />
+                                    </p>
+                                }
+                            </div>
+                            <div className="modal-footer">
+                                <Link to="statement"><button type="button" className="btn btn-primary">Ok</button></Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        }
+
+
+
+
         if (this.state.confirmExchange) {
             return (
                 <div>
@@ -142,16 +166,16 @@ export default class MarketPlace extends Component {
                         <span id="Heading-name">Exchange ></span>
                     </div>
                     <div id="exchange-box-right" className="col-md-5 exchange-box">
-<div style={{ textAlign : 'center' }}>
-            <h5> You have selected <strong>{this.state.selectedQty} </strong>assets of {this.state.selectedData.assetName} {this.state.selectedData.assetType} <br />
-            The total amount to be deducted from your account is {(this.state.selectedQty * this.state.selectedData.pricePerAsset).toLocaleString()}</h5>
-        
-                        <h5 style={{ marginTop: '30px'}}> Do you want to proceed ???</h5>
+                        <div style={{ textAlign: 'center' }}>
+                            <h5> You have selected <strong>{this.state.selectedQty} </strong>assets of {this.state.selectedData.assetName} {this.state.selectedData.assetType} <br />
+                                The total amount to be deducted from your account is {(this.state.selectedQty * this.state.selectedData.pricePerAsset).toLocaleString()}</h5>
 
-</div>
+                            <h5 style={{ marginTop: '30px' }}> Do you want to proceed ???</h5>
+
+                        </div>
 
                         <form onSubmit={this.handleSubmit.bind(this)}>
-                            <Link to="statement"><button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >Yes</button></Link>
+                           <button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >Yes</button>
                             <button id="exchange-cancel-btn" className="Button-style" type="button" onClick={this.handleCancel}>No</button>
                         </form>
                         {this.renderSubmit()}
@@ -159,30 +183,13 @@ export default class MarketPlace extends Component {
                 </div>
             );
         }
-        /*if (this.state.handleOpenCard) {
-            return (
-                <div>
-                    <div id="header">
-                        <span id="Heading-name">Transaction ></span>
-                    </div>
-                    <div id="exchange-box-left" className="col-md-5 exchange-box">
-                        <p>Please enter your card details to proceed with the transaction</p>
-                        <input className="exchange-box-left-input" placeholder="Name.."></input>  <br />
-                        <input className="exchange-box-left-input" placeholder="Card No.."></input> <br />
-                        <input className="exchange-box-left-input" placeholder="Expiry date.."></input> <br />
-                        <input className="exchange-box-left-input" placeholder="CVV.."></input>
-                        <Link to="statement"><button id="card-ok-btn" className="Btn-mkt-style" type="button" onClick={this.startTrade}>OK</button></Link>
-                    </div>
-                </div>
-            );
-        }*/
+
         if (this.state.openConfirmBuy) {
             return (
                 <div className="modal fade" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="custom-modal">
                         <div id="mp-modal" className="custom-modal">
                             <Modal show={this.state.showModal} onHide={this.closeConfirmBuy} >
-                                {/*<Modal show={this.state.showModal} onHide={this.state.hideModal} >*/}
                                 <Modal.Header closeButton className="custom-modal">
                                     <Modal.Title>Purchase asset</Modal.Title>
                                 </Modal.Header>
@@ -244,7 +251,7 @@ export default class MarketPlace extends Component {
                                             <td className="tableData width20">{emp.assetName}</td>
                                             <td className="tableData width20">{emp.ownerName}</td>
                                             <td className="tableData width20">{emp.assetType}</td>
-                                        <td id="assetprice"className="tableData width20 amtRight">{(emp.pricePerAsset).toLocaleString()}</td>
+                                            <td id="assetprice" className="tableData width20 amtRight">{(emp.pricePerAsset).toLocaleString()}</td>
                                         </tr>
                                         );
                                     })
