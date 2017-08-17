@@ -15,6 +15,7 @@ export default class MarketPlace extends Component {
         super(props);
         this.state = {
             showModal: false,
+            showModal1: false,
             assetData: [],
             openConfirmBuy: false,
             confirmExchange: false,
@@ -63,6 +64,7 @@ export default class MarketPlace extends Component {
     closeConfirmBuy() {
         this.setState({
             showModal: false,
+            showModal1: false,
             openConfirmBuy: false,
             confirmExchange: false,
         });
@@ -123,7 +125,7 @@ export default class MarketPlace extends Component {
         this.f1(amt, aid, seller, assetAmt, userWallet, walletAddr);
         this.setState({
             waitNotification: true,
-            showModal: true
+            showModal1: true
         })
     }
     handleCancel() {
@@ -139,7 +141,7 @@ export default class MarketPlace extends Component {
 
 
         if (this.state.waitNotification) {
-            <Modal show={this.state.showModal} onHide={this.closeModal} >
+            <Modal show={this.state.showModal1} onHide={this.closeModal} >
                 <Modal.Header closeButton className="custom-modal" >
                     <Modal.Title>
                         <p>
