@@ -86,7 +86,7 @@ export default class MarketPlace extends Component {
         var len = assetDetails[0].length;
         var i;
         for (i = 0; i < len; i++) {
-            if (assetDetails[4][i].c[0]){
+            if (!(assetDetails[4][i].c[0] === 0)){
             var assetQnty = atokenCon.getATBalanceOfUser(assetDetails[1][i], assetDetails[0][i]);
             var assetOwner = userCon.getUserDetailsByWallet(assetDetails[1][i]);
             data.push({ assetId: web3.toAscii(assetDetails[0][i]), assetName: web3.toAscii(assetDetails[3][i]), ownerName: web3.toAscii(assetOwner[0]), pricePerAsset: assetDetails[4][i].c[0], quantity: assetQnty.c[0], assetType: web3.toAscii(assetDetails[2][i]), sellerAddress: assetDetails[1][i], assetids: assetDetails[0][i] })
