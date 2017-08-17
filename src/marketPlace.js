@@ -27,6 +27,7 @@ export default class MarketPlace extends Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.startTrade = this.startTrade.bind(this);
         this.closeConfirmBuy = this.closeConfirmBuy.bind(this);
+        this.closeModal = this.closeModal.bind(this);
     }
     quantityRequest(e) {
         this.setState({ selectedQty: e.target.value });
@@ -80,11 +81,11 @@ export default class MarketPlace extends Component {
         var len = assetDetails[0].length;
         var i;
         for (i = 0; i < len; i++) {
-            if (!(assetDetails[4][i].c[0] === 0)){
-            var assetQnty = atokenCon.getATBalanceOfUser(assetDetails[1][i], assetDetails[0][i]);
-            var assetOwner = userCon.getUserDetailsByWallet(assetDetails[1][i]);
-            data.push({ assetId: web3.toAscii(assetDetails[0][i]), assetName: web3.toAscii(assetDetails[3][i]), ownerName: web3.toAscii(assetOwner[0]), pricePerAsset: assetDetails[4][i].c[0], quantity: assetQnty.c[0], assetType: web3.toAscii(assetDetails[2][i]), sellerAddress: assetDetails[1][i], assetids: assetDetails[0][i] })
-        }
+            if (!(assetDetails[4][i].c[0] === 0)) {
+                var assetQnty = atokenCon.getATBalanceOfUser(assetDetails[1][i], assetDetails[0][i]);
+                var assetOwner = userCon.getUserDetailsByWallet(assetDetails[1][i]);
+                data.push({ assetId: web3.toAscii(assetDetails[0][i]), assetName: web3.toAscii(assetDetails[3][i]), ownerName: web3.toAscii(assetOwner[0]), pricePerAsset: assetDetails[4][i].c[0], quantity: assetQnty.c[0], assetType: web3.toAscii(assetDetails[2][i]), sellerAddress: assetDetails[1][i], assetids: assetDetails[0][i] })
+            }
         }
         this.setState({ assetData: data });
     }
@@ -115,14 +116,15 @@ export default class MarketPlace extends Component {
     }
 
     startTrade() {
-        this.setState({
-            waitNotification: true
-        })
         var amt = this.state.selectedQty * this.state.selectedData.pricePerAsset;
         var assetAmt = this.state.selectedQty;
         var seller = this.state.selectedData.sellerAddress;
         var aid = this.state.selectedData.assetids;
         this.f1(amt, aid, seller, assetAmt, userWallet, walletAddr);
+        this.setState({
+            waitNotification: true,
+            showModal: true
+        })
     }
     handleCancel() {
         this.setState({
@@ -130,30 +132,24 @@ export default class MarketPlace extends Component {
             openConfirmBuy: false
         })
     }
+    closeModal() {
+        this.setState({ showModal: false })
+    }
     render() {
 
-        {
-            this.state.waitNotification &&
-                <div className="modal-wrapper modal">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h4 className="modal-title">Confirmation</h4>
-                            </div>
-                            <div className="modal-body">
-                                {
-                                    <p>
-                                        Your transaction may take 13-15 sec <br />
-                                        Please reload your browser after 15 sec to get your trade reflected in your ledger<br />
-                                    </p>
-                                }
-                            </div>
-                            <div className="modal-footer">
-                                <Link to="statement"><button type="button" className="btn btn-primary">Ok</button></Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+        if (this.state.waitNotification) {
+            <Modal show={this.state.showModal} onHide={this.closeModal} >
+                <Modal.Header closeButton className="custom-modal" >
+                    <Modal.Title>
+                        <p>
+                            Your transaction may take 13-15 sec <br />
+                            Please reload your browser after 15 sec to get your trade reflected in your ledger<br />
+                        </p>
+                    </Modal.Title>
+                    <Link to="statement"><button type="button" className="btn btn-primary">Ok</button></Link>
+                </Modal.Header>
+            </Modal>
         }
 
 
@@ -175,7 +171,7 @@ export default class MarketPlace extends Component {
                         </div>
 
                         <form onSubmit={this.handleSubmit.bind(this)}>
-                           <button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >Yes</button>
+                            <button id="exchange-ok-btn" className="Button-style" type="button" onClick={this.startTrade} >Yes</button>
                             <button id="exchange-cancel-btn" className="Button-style" type="button" onClick={this.handleCancel}>No</button>
                         </form>
                         {this.renderSubmit()}
